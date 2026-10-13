@@ -1,0 +1,24 @@
+{
+  "name": "ours-image-service",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/api",
+    "apps/web"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,web -c blue,green \"npm run dev -w @ours/api\" \"npm run dev -w @ours/web\"",
+    "dev:api": "npm run dev -w @ours/api",
+    "dev:web": "npm run dev -w @ours/web",
+    "build": "npm run build -w @ours/api && npm run build -w @ours/web",
+    "test": "npm run test -w @ours/api",
+    "typecheck": "npm run typecheck -w @ours/api && npm run typecheck -w @ours/web"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
