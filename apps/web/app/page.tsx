@@ -121,7 +121,7 @@ export default function HomePage() {
         URL.revokeObjectURL(objectUrl);
       }
     };
-  }, [requestUrl]);
+  }, [requestUrl, requestId]);
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
