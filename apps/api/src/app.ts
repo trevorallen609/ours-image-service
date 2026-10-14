@@ -2,6 +2,7 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
+import { imageRouter } from "./routes/image.js";
 
 export function createApp() {
   const app = express();
@@ -23,7 +24,7 @@ export function createApp() {
     res.status(200).json({ status: "ok" });
   });
 
-  // The processing endpoint will be added in the next milestone.
+  app.use("/api/image", imageRouter);
   app.get("/", (_req, res) => {
     res.json({
       service: "ours-image-service",
