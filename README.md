@@ -6,20 +6,25 @@ The service fetches remote images over HTTPS, validates and transforms them usin
 
 ## Features
 
-- **Image transformations:** resize, rotate based on image orientation, and convert between JPEG, PNG, WebP, and AVIF.
-- **Configurable output:** width, height, fit mode, format, and quality.
-- **Input validation:** validates URL and transformation parameters before processing.
-- **SSRF defenses:** validates remote destinations, rejects unsafe IP addresses, pins HTTPS connections to validated IPs, and revalidates redirect destinations.
-- **Resource limits:** limits source downloads to 10 MiB, decoded image dimensions to 40 million pixels, and remote DNS/HTTP request durations.
+- **Image transformations:** Resize, rotate based on image orientation, and convert between JPEG, PNG, WebP, and AVIF.
+- **Configurable output:** Width, height, fit mode, format, and quality.
+- **Input validation:** Validates source URLs and transformation parameters before processing.
+- **SSRF defenses:** Validates remote destinations, rejects unsafe IP addresses, pins HTTPS connections to validated IPs, and revalidates redirect destinations.
+- **Resource limits:** Limits source downloads to 10 MiB, decoded image dimensions to 40 million pixels, and remote DNS/HTTP request durations.
 - **API hardening:** Helmet security headers, CORS configuration, rate limiting, and safe error responses.
-- **Automated tests:** API tests using Vitest and Supertest.
+- **Automated testing:** API tests using Vitest and Supertest, and frontend component tests using Vitest and React Testing Library.
 
 ## Repository structure
 
 ```text
 apps/
-  api/       Express + TypeScript API
-  web/       Next.js + TypeScript playground
+  api/       Express + TypeScript API and API tests
+  web/       Next.js + TypeScript playground and frontend tests
+    app/
+      page.tsx
+      page.test.tsx
+    vitest.config.ts
+    vitest.setup.ts
 .github/
   workflows/ CI workflows
 docs/        Design notes and operational decisions
@@ -27,7 +32,7 @@ docs/        Design notes and operational decisions
 
 ## Prerequisites
 
-- Node.js 20 or newer
+- Node.js 22 or newer
 - npm 10 or newer
 
 ## Local development
@@ -52,9 +57,9 @@ docs/        Design notes and operational decisions
    npm run dev
    ```
 
-5. Open the web application at `http://localhost:3000`. Check the API startup output or local configuration for its actual port.
+5. Open the web application at [http://localhost:3000](http://localhost:3000). Check the API startup output or local configuration for its actual port.
 
-If you want to run either application independently:
+To run either application independently:
 
 ```bash
 npm run dev:api
@@ -65,14 +70,18 @@ npm run dev:web
 
 Run these commands from the repository root.
 
-| Command             | Description                        |
-| ------------------- | ---------------------------------- |
-| `npm run dev`       | Start the API and web applications |
-| `npm run dev:api`   | Start the API only                 |
-| `npm run dev:web`   | Start the web application only     |
-| `npm run build`     | Build both applications            |
-| `npm test`          | Run API tests                      |
-| `npm run typecheck` | Type-check both applications       |
+| Command                     | Description                        |
+| --------------------------- | ---------------------------------- |
+| `npm run dev`               | Start the API and web applications |
+| `npm run dev:api`           | Start the API only                 |
+| `npm run dev:web`           | Start the web application only     |
+| `npm run build`             | Build both applications            |
+| `npm test`                  | Run API and frontend test suites   |
+| `npm run test -w @ours/api` | Run API tests only                 |
+| `npm run test -w @ours/web` | Run frontend tests only            |
+| `npm run typecheck`         | Type-check both applications       |
+
+The root `npm test` command runs both suites sequentially, provided the root script has been configured accordingly.
 
 ## API reference
 
@@ -164,17 +173,63 @@ Successful image responses use a private cache policy with a five-minute maximum
 
 ## Testing and verification
 
-Run the complete local checks:
+The project uses Vitest for automated testing.
+
+- **API tests:** Vitest and Supertest for API behavior and request validation.
+- **Frontend tests:** Vitest, React Testing Library, and jsdom for component rendering and UI behavior.
+
+The frontend test suite covers:
+
+- Rendering the image playground and transformation controls.
+- Image transformation API requests and query parameters.
+- HTTP and network error handling.
+- Source URL and dimension validation.
+- Request cancellation when settings change or the component unmounts.
+- Blob URL cleanup and late-response race conditions.
+
+Frontend tests mock API responses and browser Blob URL methods, so they do not require a running API server or an external image service.
+
+### Run all tests
+
+From the repository root:
+
+```bash
+npm test
+```
+
+### Run tests individually
+
+API tests:
+
+```bash
+npm run test -w @ours/api
+```
+
+Frontend tests:
+
+```bash
+npm run test -w @ours/web
+```
+
+### Type checking
+
+Check TypeScript across both workspaces:
 
 ```bash
 npm run typecheck
-npm test
+```
+
+### Production build
+
+Build both applications:
+
+```bash
 npm run build
 ```
 
-Security regression tests should cover unsafe IPv4 and IPv6 addresses, mixed DNS answers, redirect validation, connection pinning, timeouts, oversized responses, aborted downloads, and malformed image data.
-
 Passing the automated suite is useful evidence, but it does not replace deployment-level security review.
+
+Security regression tests should cover unsafe IPv4 and IPv6 addresses, mixed DNS answers, redirect validation, connection pinning, timeouts, oversized responses, aborted downloads, and malformed image data.
 
 ## Architecture and trade-offs
 

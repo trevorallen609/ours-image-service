@@ -11,7 +11,7 @@
     "dev:api": "npm run dev -w @ours/api",
     "dev:web": "npm run dev -w @ours/web",
     "build": "npm run build -w @ours/api && npm run build -w @ours/web",
-    "test": "npm run test -w @ours/api",
+    "test": "npm run test -w @ours/api && npm run test -w @ours/web",
     "typecheck": "npm run typecheck -w @ours/api && npm run typecheck -w @ours/web"
   },
   "devDependencies": {
