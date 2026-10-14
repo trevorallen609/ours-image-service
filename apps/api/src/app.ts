@@ -9,7 +9,11 @@ export function createApp() {
   const allowedOrigin = process.env.WEB_ORIGIN ?? "http://localhost:3000";
 
   app.disable("x-powered-by");
-  app.use(helmet());
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: { policy: "cross-origin" },
+    }),
+  );
   app.use(cors({ origin: allowedOrigin }));
   app.use(
     rateLimit({
